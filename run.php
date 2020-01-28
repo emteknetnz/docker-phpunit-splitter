@@ -2,6 +2,10 @@
 
 $logdir = 'phpunitlogs';
 
+if (!file_exists('vendor/bin/phpunit')) {
+    shell_exec('composer install');
+}
+
 $time_start = microtime(true); 
 
 shell_exec("rm -rf $logdir && mkdir $logdir");
@@ -9,8 +13,8 @@ shell_exec("rm -rf $logdir && mkdir $logdir");
 $s = file_get_contents('unittests.php');
 preg_match_all('%function (test[^\( ]*)%', $s, $m);
 foreach ($m[1] as $funcname) {
-    echo "Testing $funcname\n";
-    shell_exec("docker run --name myphpunit-$funcname --rm -d -v $(pwd):/a php:cli bash -c '/a/vendor/bin/phpunit --filter=testOne /a/unittests.php > /a/phpunitlogs/$funcname.txt 2>&1'");
+    echo "Creating container for $funcname\n";
+    shell_exec("docker run --name myphpunit-$funcname --rm -d -v $(pwd):/a php:cli bash -c '/a/vendor/bin/phpunit --filter=$funcname /a/unittests.php > /a/phpunitlogs/$funcname.txt 2>&1'");
 }
 
 for ($i = 0; $i < 10; $i++) {
@@ -35,4 +39,4 @@ foreach (scandir($logdir) as $filename) {
 }
 
 $execution_time = round(microtime(true) - $time_start, 2);
-echo "Total Execution Time: $execution_time seconds\n";
+echo "\n\nTotal Execution Time: $execution_time seconds\n\n";
