@@ -1,0 +1,7 @@
+{
+    "name": "osboxes/phpunittest",
+    "require-dev": {
+        "phpunit/phpunit": "^5.7"
+    },
+    "require": {}
+}
